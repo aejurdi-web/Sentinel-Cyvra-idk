@@ -1,0 +1,13 @@
+# Node / Electron
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+out/
+.DS_Store
+.env
+.vscode/
+.cache/
+coverage/
+build/

@@ -1,0 +1,44 @@
+{
+  "name": "sentinel",
+  "version": "1.0.0",
+  "description": "A local password manager built with Electron — Sentinel.",
+  "main": "main.js",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "electron": "^30.0.0",
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.0"
+  },
+  "build": {
+    "appId": "com.sentinel.app",
+    "productName": "Sentinel",
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/.bin",
+      "!**/*.map"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Sentinel"
+    }
+  }
+}
