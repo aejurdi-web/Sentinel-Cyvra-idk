@@ -15,7 +15,7 @@ function averageStrength(credentials: StoredCredential[]) {
   return Math.round((score / credentials.length) * 100);
 }
 
-export const StatsCards: React.FC<Props> = ({ credentials }) => {
+const StatsCards: React.FC<Props> = ({ credentials }) => {
   const compromised = credentials.filter(c => c.breachStatus === 'compromised').length;
   const autoReset = credentials.filter(c => c.autoReset).length;
   const avgStrength = averageStrength(credentials);

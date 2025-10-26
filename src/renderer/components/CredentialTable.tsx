@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch } from './Switch';
+import Switch from './Switch';
 import type { StoredCredential } from '../../utils/database';
 
 interface Props {
@@ -9,12 +9,7 @@ interface Props {
   onTriggerReset: (id: string) => void;
 }
 
-export const CredentialTable: React.FC<Props> = ({
-  credentials,
-  onToggleAutoReset,
-  onDelete,
-  onTriggerReset
-}) => {
+const CredentialTable: React.FC<Props> = ({ credentials, onToggleAutoReset, onDelete, onTriggerReset }) => {
   return (
     <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80">
       <table className="min-w-full divide-y divide-slate-800">
@@ -71,9 +66,7 @@ export const CredentialTable: React.FC<Props> = ({
           })}
         </tbody>
       </table>
-      {!credentials.length && (
-        <div className="p-6 text-center text-sm text-slate-400">No credentials stored yet.</div>
-      )}
+      {!credentials.length && <div className="p-6 text-center text-sm text-slate-400">No credentials stored yet.</div>}
     </div>
   );
 };

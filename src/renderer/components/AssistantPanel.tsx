@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { OpenAI } from '@openai/openai';
+import OpenAI from 'openai';
 import type { StoredCredential } from '../../utils/database';
 
 interface Props {
   credentials: StoredCredential[];
 }
 
-const client = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+const client = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
+});
 
-export const AssistantPanel: React.FC<Props> = ({ credentials }) => {
+const AssistantPanel: React.FC<Props> = ({ credentials }) => {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
     {
       role: 'assistant',
-      content: 'Hi! I am Sentinel AI. Ask me about password strength, automation logs, or request a strong password suggestion.'
+      content:
+        'Hi! I am Sentinel AI. Ask me about password strength, automation logs, or request a strong password suggestion.'
     }
   ]);
   const [input, setInput] = useState('');
@@ -40,9 +44,13 @@ export const AssistantPanel: React.FC<Props> = ({ credentials }) => {
       const text = response.output_text ?? 'I was unable to generate a response.';
       setMessages([...nextMessages, { role: 'assistant', content: text }]);
     } catch (error) {
+      console.error('OpenAI request failed', error);
       setMessages([
         ...nextMessages,
-        { role: 'assistant', content: 'There was an error contacting OpenAI. Check your API key and network connection.' }
+        {
+          role: 'assistant',
+          content: 'There was an error contacting OpenAI. Check your API key and network connection.'
+        }
       ]);
     } finally {
       setLoading(false);

@@ -5,7 +5,7 @@ interface Props {
   onCheckedChange: (checked: boolean) => void;
 }
 
-export const Switch: React.FC<Props> = ({ checked, onCheckedChange }) => {
+const Switch: React.FC<Props> = ({ checked, onCheckedChange }) => {
   return (
     <button
       type="button"

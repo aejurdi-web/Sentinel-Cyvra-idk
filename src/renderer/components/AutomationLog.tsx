@@ -5,7 +5,7 @@ interface Props {
   logs: AutomationLogEntry[];
 }
 
-export const AutomationLog: React.FC<Props> = ({ logs }) => {
+const AutomationLog: React.FC<Props> = ({ logs }) => {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
       <div className="flex items-center justify-between">

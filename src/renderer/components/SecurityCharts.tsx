@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  CartesianGrid
-} from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts';
 import type { StoredCredential } from '../../utils/database';
 
 interface Props {
@@ -30,7 +20,7 @@ function buildStrengthData(credentials: StoredCredential[]) {
   }));
 }
 
-export const SecurityCharts: React.FC<Props> = ({ credentials }) => {
+const SecurityCharts: React.FC<Props> = ({ credentials }) => {
   const resetData = buildResetData(credentials).map(entry => ({
     ...entry,
     lastResetDays: entry.lastReset ? Math.round((Date.now() - entry.lastReset) / (1000 * 60 * 60 * 24)) : 999
