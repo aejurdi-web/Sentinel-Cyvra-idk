@@ -1,51 +1,106 @@
-import { useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AutomationLogEntry } from '../../automation/passwordResetEngine';
 import type { StoredCredential } from '../../utils/database';
 
 export function useCredentials() {
-  const queryClient = useQueryClient();
-  const listQuery = useQuery<StoredCredential[]>({
-    queryKey: ['credentials'],
-    queryFn: () => window.sentinel.listCredentials()
-  });
+  const [data, setData] = useState<StoredCredential[] | undefined>();
+  const [error, setError] = useState<unknown>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const latestRequest = useRef(0);
 
-  const saveMutation = useMutation({
-    mutationFn: (credential: unknown) => window.sentinel.saveCredential(credential),
-    onSuccess: data => {
-      queryClient.setQueryData(['credentials'], data);
+  const refetch = useCallback(async () => {
+    const requestId = Date.now();
+    latestRequest.current = requestId;
+    setIsLoading(true);
+    try {
+      const credentials = await window.sentinel.listCredentials();
+      if (latestRequest.current === requestId) {
+        setData(credentials);
+        setError(undefined);
+      }
+    } catch (err) {
+      if (latestRequest.current === requestId) {
+        setError(err);
+      }
+    } finally {
+      if (latestRequest.current === requestId) {
+        setIsLoading(false);
+      }
     }
-  });
+  }, []);
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => window.sentinel.deleteCredential(id),
-    onSuccess: data => {
-      queryClient.setQueryData(['credentials'], data);
-    }
-  });
+  useEffect(() => {
+    void refetch();
+  }, [refetch]);
 
-  const importMutation = useMutation({
-    mutationFn: () => window.sentinel.importVault(),
-    onSuccess: data => {
-      queryClient.setQueryData(['credentials'], data);
-    }
-  });
+  const updateState = useCallback((next: StoredCredential[] | undefined) => {
+    setData(next);
+    setIsLoading(false);
+  }, []);
+
+  const saveCredential = useCallback(async (credential: unknown) => {
+    const next = await window.sentinel.saveCredential(credential);
+    updateState(next);
+    return next;
+  }, [updateState]);
+
+  const deleteCredential = useCallback(async (id: string) => {
+    const next = await window.sentinel.deleteCredential(id);
+    updateState(next);
+    return next;
+  }, [updateState]);
+
+  const importVault = useCallback(async () => {
+    const next = await window.sentinel.importVault();
+    updateState(next);
+    return next;
+  }, [updateState]);
+
+  const exportVault = useCallback(() => window.sentinel.exportVault(), []);
 
   return {
-    listQuery,
-    saveCredential: saveMutation.mutateAsync,
-    deleteCredential: deleteMutation.mutateAsync,
-    importVault: importMutation.mutateAsync,
-    exportVault: () => window.sentinel.exportVault()
+    data,
+    error,
+    isLoading,
+    refetch,
+    saveCredential,
+    deleteCredential,
+    importVault,
+    exportVault
   };
 }
 
 export function useAutomationLogs() {
-  return useQuery<AutomationLogEntry[]>({
-    queryKey: ['automation-logs'],
-    queryFn: () => window.sentinel.getLogs(),
-    refetchInterval: 10000
-  });
+  const [logs, setLogs] = useState<AutomationLogEntry[]>([]);
+  const [error, setError] = useState<unknown>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      const next = await window.sentinel.getLogs();
+      setLogs(next);
+      setError(undefined);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchLogs();
+    const interval = window.setInterval(() => {
+      void fetchLogs();
+    }, 10000);
+    return () => window.clearInterval(interval);
+  }, [fetchLogs]);
+
+  return useMemo(() => ({
+    data: logs,
+    error,
+    isLoading,
+    refetch: fetchLogs
+  }), [logs, error, isLoading, fetchLogs]);
 }
 
 export function useAutomationEvents(onLog: (entry: AutomationLogEntry) => void) {

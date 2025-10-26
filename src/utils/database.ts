@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import BetterSqlite3 from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { encrypt, decrypt, EncryptionPayload } from './crypto';
@@ -19,12 +19,12 @@ export interface StoredCredential {
 
 export class VaultDatabase {
   private static instance: VaultDatabase;
-  private db: Database.Database;
+  private db: BetterSqlite3;
 
   private constructor() {
     const dbPath = path.join(process.cwd(), 'vault.db');
     const firstRun = !fs.existsSync(dbPath);
-    this.db = new Database(dbPath);
+    this.db = new BetterSqlite3(dbPath);
     if (firstRun) {
       this.initialize();
     }

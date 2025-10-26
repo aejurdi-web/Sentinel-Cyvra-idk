@@ -8,11 +8,9 @@ import AutomationLog from '../components/AutomationLog';
 import AssistantPanel from '../components/AssistantPanel';
 
 const App: React.FC = () => {
-  const { listQuery, saveCredential, deleteCredential, exportVault, importVault } = useCredentials();
+  const { data: credentialsData, refetch, saveCredential, deleteCredential, exportVault, importVault } = useCredentials();
   const { data: logs } = useAutomationLogs();
   const [locked, setLocked] = useState(false);
-
-  const { data: credentialsData, refetch } = listQuery;
 
   useEffect(() => {
     window.sentinel.onVaultLock(() => setLocked(true));
